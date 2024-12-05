@@ -22,9 +22,17 @@ const playAgainButton = document.getElementById("playAgain");
 const newGameButton = document.getElementById("newGame");
 const userScoreElement = document.getElementById("userScore");
 const computerScoreElement = document.getElementById("computerScore");
+const choicesElements = document.querySelectorAll('.choice');
+
+// Disable choices initially
+choicesElements.forEach(choice => {
+    choice.classList.add('disabled');
+});
 
 document.querySelectorAll('.choice').forEach(choice => {
     choice.addEventListener('click', function () {
+        if (choice.classList.contains('disabled')) return;
+
         const userChoice = this.id;
         const computerChoice = getComputerChoice();
         const result = determineWinner(userChoice, computerChoice);
@@ -35,18 +43,22 @@ document.querySelectorAll('.choice').forEach(choice => {
 
         updateScores(result);
         playAgainButton.style.display = "block";
+        disableChoices();
     });
 });
 
 playAgainButton.addEventListener('click', () => {
-    resetGame();
+    resetGameForPlayAgain();
+    enableChoices();
+    playAgainButton.style.display = "none"; // Hide "Play Again" button until user makes a choice
 });
 
 newGameButton.addEventListener('click', () => {
     userScore = 0;
     computerScore = 0;
     updateScoreDisplay();
-    resetGame();
+    resetGameForNewGame();
+    enableChoices();
 });
 
 function getComputerChoice() {
@@ -80,9 +92,30 @@ function updateScoreDisplay() {
     computerScoreElement.textContent = `Computer: ${computerScore}`;
 }
 
-function resetGame() {
+function resetGameForPlayAgain() {
+    userChoiceElement.innerHTML = "";
+    computerChoiceElement.innerHTML = "";
+    resultMessageElement.textContent = "";
+}
+
+function resetGameForNewGame() {
     userChoiceElement.innerHTML = "";
     computerChoiceElement.innerHTML = "";
     resultMessageElement.textContent = "";
     playAgainButton.style.display = "none";
+    choicesElements.forEach(choice => {
+        choice.classList.add('disabled');
+    });
+}
+
+function disableChoices() {
+    choicesElements.forEach(choice => {
+        choice.classList.add('disabled');
+    });
+}
+
+function enableChoices() {
+    choicesElements.forEach(choice => {
+        choice.classList.remove('disabled');
+    });
 }
