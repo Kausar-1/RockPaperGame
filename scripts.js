@@ -19,20 +19,23 @@ const userChoiceElement = document.getElementById("userChoice");
 const computerChoiceElement = document.getElementById("computerChoice");
 const resultMessageElement = document.getElementById("resultMessage");
 const playAgainButton = document.getElementById("playAgain");
-const newGameButton = document.getElementById("newGame");
+const startGameButton = document.getElementById("startGame");
 const userScoreElement = document.getElementById("userScore");
 const computerScoreElement = document.getElementById("computerScore");
 const choicesElements = document.querySelectorAll('.choice');
-
-// Disable choices initially
-choicesElements.forEach(choice => {
-    choice.classList.add('disabled');
-});
+const selectSound = document.getElementById("selectSound");
+const resultSound = document.getElementById("resultSound");
+const sadSound = document.getElementById("sadSound");
+const countdownSound = document.getElementById("countdownSound");
+const buttonClickSound = new Audio("click.mp3"); // Sound for button clicks
 
 document.querySelectorAll('.choice').forEach(choice => {
     choice.addEventListener('click', function () {
         if (choice.classList.contains('disabled')) return;
 
+        // Play selection sound
+        selectSound.play();
+        
         const userChoice = this.id;
         const computerChoice = getComputerChoice();
         const result = determineWinner(userChoice, computerChoice);
@@ -44,21 +47,31 @@ document.querySelectorAll('.choice').forEach(choice => {
         updateScores(result);
         playAgainButton.style.display = "block";
         disableChoices();
+
+        // Play appropriate result sound
+        if (result === "win") {
+            resultSound.play();
+        } else if (result === "lose") {
+            sadSound.play();
+        }
     });
 });
 
-playAgainButton.addEventListener('click', () => {
-    resetGameForPlayAgain();
-    enableChoices();
-    playAgainButton.style.display = "none"; // Hide "Play Again" button until user makes a choice
+startGameButton.addEventListener('click', () => {
+    // Play button click sound
+    buttonClickSound.play();
+    
+    startGame();
+    startGameButton.style.display = "none"; // Hide start button
 });
 
-newGameButton.addEventListener('click', () => {
-    userScore = 0;
-    computerScore = 0;
-    updateScoreDisplay();
-    resetGameForNewGame();
+playAgainButton.addEventListener('click', () => {
+    // Play button click sound
+    buttonClickSound.play();
+    
+    resetGameForPlayAgain();
     enableChoices();
+    playAgainButton.style.display = "none"; // Hide play again button until user makes a choice
 });
 
 function getComputerChoice() {
@@ -98,16 +111,6 @@ function resetGameForPlayAgain() {
     resultMessageElement.textContent = "";
 }
 
-function resetGameForNewGame() {
-    userChoiceElement.innerHTML = "";
-    computerChoiceElement.innerHTML = "";
-    resultMessageElement.textContent = "";
-    playAgainButton.style.display = "none";
-    choicesElements.forEach(choice => {
-        choice.classList.add('disabled');
-    });
-}
-
 function disableChoices() {
     choicesElements.forEach(choice => {
         choice.classList.add('disabled');
@@ -117,5 +120,33 @@ function disableChoices() {
 function enableChoices() {
     choicesElements.forEach(choice => {
         choice.classList.remove('disabled');
+    });
+}
+
+function startGame() {
+    enableChoices();
+    const newGameButton = document.createElement("button");
+    newGameButton.id = "newGame";
+    newGameButton.textContent = "New Game";
+    newGameButton.addEventListener('click', () => {
+        // Play button click sound
+        buttonClickSound.play();
+        
+        userScore = 0;
+        computerScore = 0;
+        updateScoreDisplay();
+        resetGameForNewGame();
+        enableChoices();
+    });
+    document.querySelector('.button-container').appendChild(newGameButton);
+}
+
+function resetGameForNewGame() {
+    userChoiceElement.innerHTML = "";
+    computerChoiceElement.innerHTML = "";
+    resultMessageElement.textContent = "";
+    playAgainButton.style.display = "none";
+    choicesElements.forEach(choice => {
+        choice.classList.add('disabled');
     });
 }
